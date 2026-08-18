@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Genetics Laboratory | Monohybrid Crosses — CAPS Grade 12 Life Sciences</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bench:#EAE6DA;
+  --bench-deep:#DCD6C4;
+  --bench-line:#C8C0AA;
+  --panel:#132322;
+  --panel-2:#0E1B1A;
+  --glow:#3FE0CE;
+  --glow-dim:#28998C;
+  --ink:#1B211F;
+  --ink-soft:#4A524F;
+  --steel:#8B948E;
+  --teal:#0E8C7F;
+  --teal-deep:#0A6459;
+  --amber:#DC9A32;
+  --amber-deep:#B87A1C;
+  --rose:#BD4C67;
+  --rose-deep:#8F3550;
+  --sage:#3E7D4C;
+  --sage-deep:#2C5C37;
+  --white:#FFFDF8;
+  --danger:#B8394A;
+  --danger-bg:#F6DEDF;
+  --success:#28855A;
+  --success-bg:#DCEFDF;
+  --radius:10px;
+  --shadow:0 2px 0 rgba(27,33,31,0.06), 0 8px 20px -10px rgba(27,33,31,0.25);
+  --font-display:'Space Grotesk', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+  --font-body:'Inter', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 10% 0%, #F1EDE0 0%, transparent 45%),
+    linear-gradient(180deg, var(--bench) 0%, var(--bench-deep) 100%);
+  color:var(--ink);
+  font-family:var(--font-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-display); margin:0; letter-spacing:-0.01em;}
+p{margin:0;}
+button{font-family:var(--font-body); cursor:pointer;}
+:focus-visible{outline:3px solid var(--amber); outline-offset:2px;}
+.sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+
+/* ===================== LAYOUT SHELL ===================== */
+.lab-frame{max-width:1180px; margin:0 auto; padding:0 20px 80px;}
+.lab-header{
+  padding:26px 0 18px;
+  display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px;
+  border-bottom:3px solid var(--ink);
+}
+.brand{display:flex; align-items:center; gap:14px;}
+.brand-mark{
+  width:46px; height:46px; border-radius:50%;
+  background:conic-gradient(from 220deg, var(--teal), var(--rose), var(--amber), var(--teal));
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 0 0 3px var(--bench), inset 0 0 0 5px var(--ink);
+  flex:none;
+}
+.brand-mark span{font-family:var(--font-mono); font-weight:700; color:var(--panel); font-size:15px;}
+.brand-text h1{font-size:22px; font-weight:700;}
+.brand-text p{font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; letter-spacing:0.09em; color:var(--ink-soft); margin-top:3px;}
+.curriculum-tag{
+  font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.07em;
+  background:var(--panel); color:var(--glow); padding:7px 12px; border-radius:20px;
+  white-space:nowrap;
+}
+
+.tab-nav{
+  display:flex; gap:6px; margin-top:20px; overflow-x:auto; padding-bottom:2px;
+}
+.tab-btn{
+  border:none; background:transparent; padding:11px 16px; font-family:var(--font-display);
+  font-weight:600; font-size:14.5px; color:var(--ink-soft); border-radius:8px 8px 0 0;
+  position:relative; white-space:nowrap; transition:color .15s ease, background .15s ease;
+}
+.tab-btn .tab-dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px; vertical-align:middle;}
+.tab-btn[data-mode="complete"] .tab-dot{background:var(--sage);}
+.tab-btn[data-mode="incomplete"] .tab-dot{background:var(--rose);}
+.tab-btn[data-mode="codominance"] .tab-dot{background:var(--amber-deep);}
+.tab-btn[data-mode="practice"] .tab-dot{background:var(--teal);}
+.tab-btn:hover{color:var(--ink); background:rgba(27,33,31,0.06);}
+.tab-btn.active{color:var(--ink); background:var(--white); box-shadow: var(--shadow);}
+.tab-btn.active::after{
+  content:""; position:absolute; left:0; right:0; bottom:-3px; height:3px; background:var(--ink);
+}
+
+main{margin-top:0;}
+.mode-panel{display:none; padding-top:26px; animation:fadeIn .35s ease;}
+.mode-panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.mode-intro{
+  background:var(--white); border:1px solid var(--bench-line); border-radius:var(--radius);
+  padding:18px 22px; margin-bottom:22px; box-shadow:var(--shadow);
+  display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;
+}
+.mode-intro .badge{
+  font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+  padding:4px 10px; border-radius:20px; color:var(--white); flex:none; margin-top:3px;
+}
+.badge.complete{background:var(--sage);}
+.badge.incomplete{background:var(--rose);}
+.badge.codominance{background:var(--amber-deep);}
+.mode-intro h2{font-size:19px; margin-bottom:4px;}
+.mode-intro .note{font-size:13.5px; color:var(--ink-soft); max-width:70ch;}
+
+/* ===================== STATION CARDS ===================== */
+.station{
+  background:var(--white); border:1px solid var(--bench-line); border-radius:var(--radius);
+  padding:20px 22px; margin-bottom:22px; box-shadow:var(--shadow);
+}
+.station-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; flex-wrap:wrap;}
+.station-head h3{font-size:15.5px; display:flex; align-items:center; gap:8px;}
+.station-head h3 .num{
+  font-family:var(--font-mono); font-size:11px; background:var(--ink); color:var(--white);
+  width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;
+}
+.station-head .hint{font-size:12px; color:var(--steel);}
+
+/* Parent selection station */
+.parents-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media(max-width:680px){.parents-grid{grid-template-columns:1fr;}}
+.parent-card{
+  border:1.5px dashed var(--bench-line); border-radius:8px; padding:14px; background:#FCFAF3;
+}
+.parent-card .parent-title{
+  font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--steel);
+  margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;
+}
+.geno-options{display:flex; flex-direction:column; gap:6px;}
+.geno-opt{
+  text-align:left; border:1.5px solid var(--bench-line); background:var(--white); border-radius:7px;
+  padding:9px 11px; font-size:13px; transition:all .12s ease; display:flex; justify-content:space-between; gap:8px;
+}
+.geno-opt .code{font-family:var(--font-mono); font-weight:700; font-size:13.5px;}
+.geno-opt:hover{border-color:var(--teal); background:#F0F8F6;}
+.geno-opt.active{border-color:var(--ink); background:var(--ink); color:var(--white);}
+.geno-opt.active .code{color:var(--glow);}
+.parent-readout{
+  margin-top:10px; font-family:var(--font-mono); font-size:12px; color:var(--ink-soft);
+  background:var(--bench); border-radius:6px; padding:7px 9px;
+}
+.parent-readout b{color:var(--ink);}
+.randomize-row{margin-top:14px; display:flex; justify-content:flex-end;}
+
+/* Buttons */
+.btn{
+  border-radius:7px; padding:9px 15px; font-weight:600; font-size:13px; border:1.5px solid transparent;
+  transition:transform .08s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--teal); color:var(--white);}
+.btn-primary:hover{background:var(--teal-deep);}
+.btn-outline{background:var(--white); border-color:var(--ink); color:var(--ink);}
+.btn-outline:hover{background:var(--ink); color:var(--white);}
+.btn-ghost{background:transparent; color:var(--ink-soft); border-color:var(--bench-line);}
+.btn-ghost:hover{border-color:var(--ink-soft); color:var(--ink);}
+.btn-amber{background:var(--amber); color:#3A2B08;}
+.btn-amber:hover{background:var(--amber-deep); color:var(--white);}
+.btn:disabled{opacity:0.45; cursor:not-allowed; transform:none;}
+
+/* ===================== PUNNETT SQUARE ===================== */
+.punnett-wrap{display:grid; grid-template-columns:auto 1fr auto; gap:18px; align-items:center;}
+@media(max-width:760px){.punnett-wrap{grid-template-columns:1fr; justify-items:center;}}
+.gamete-pool{text-align:center;}
+.pool-label{display:block; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--steel); margin-bottom:8px;}
+.chip-row{display:flex; gap:8px; justify-content:center;}
+[data-parent="A"] .chip-row{flex-direction:column;}
+.chip{
+  font-family:var(--font-mono); font-weight:700; font-size:16px; width:44px; height:44px;
+  border-radius:8px; border:2px solid var(--ink); background:var(--white); color:var(--ink);
+  display:flex; align-items:center; justify-content:center; user-select:none; transition:all .12s ease;
+  box-shadow:0 2px 0 var(--ink);
+}
+.chip:hover:not(.placed){background:#FFF6DE; border-color:var(--amber-deep);}
+.chip.selected{background:var(--amber); border-color:var(--amber-deep); box-shadow:0 2px 0 var(--amber-deep); transform:translateY(-1px);}
+.chip.placed{opacity:0.28; box-shadow:none; cursor:not-allowed;}
+.chip sup{font-size:10px;}
+
+.punnett-table{border-collapse:collapse; margin:0 auto;}
+.punnett-table td{border:2px solid var(--ink); width:76px; height:64px; text-align:center; vertical-align:middle; position:relative;}
+.punnett-table .corner{background:var(--ink);}
+.punnett-table .zone{
+  background:var(--bench); cursor:pointer; font-family:var(--font-mono); font-weight:700; font-size:17px;
+  transition:background .12s ease;
+}
+.punnett-table .zone.empty::after{content:"·"; color:var(--steel); font-size:20px;}
+.punnett-table .zone:hover{background:#F0F8F6;}
+.punnett-table .zone.filled{background:#E4F4EF; color:var(--teal-deep);}
+.punnett-table .cell{background:var(--white); font-size:12px; padding:4px;}
+.punnett-table .cell.active-cell{cursor:pointer; background:#FFFCF0;}
+.punnett-table .cell.active-cell:hover{background:#FFF6DE;}
+.punnett-table .cell.correct{background:var(--success-bg);}
+.punnett-table .cell.flash-wrong{animation:flashWrong .5s ease;}
+@keyframes flashWrong{0%,100%{background:var(--white);} 40%{background:var(--danger-bg);}}
+.cell-genotype{font-family:var(--font-mono); font-weight:700; font-size:14px; margin-bottom:3px;}
+.cell-pheno-select{
+  font-size:10.5px; font-family:var(--font-body); border-radius:4px; border:1px solid var(--bench-line);
+  padding:2px 3px; width:90%; max-width:80px;
+}
+.punnett-controls{display:flex; gap:8px; justify-content:center; margin-top:18px; flex-wrap:wrap;}
+.punnett-feedback{
+  text-align:center; margin-top:10px; font-size:12.5px; font-weight:600; min-height:16px; color:var(--ink-soft);
+}
+.punnett-feedback.ok{color:var(--success);}
+.punnett-feedback.bad{color:var(--danger);}
+
+/* ===================== VISUALIZER + READOUTS ===================== */
+.offspring-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; min-height:150px; align-items:center;}
+.offspring-card{
+  width:120px; text-align:center; background:#FBF9F0; border:1px solid var(--bench-line); border-radius:8px; padding:8px 6px 10px;
+}
+.offspring-icon{width:100%; height:auto;}
+.icon-caption{font-family:var(--font-mono); font-size:11px; fill:var(--ink-soft);}
+.offspring-card .geno-tag{font-family:var(--font-mono); font-size:12px; font-weight:700; margin-top:4px;}
+.placeholder-note{
+  text-align:center; color:var(--steel); font-size:13px; padding:30px 10px; font-style:italic;
+}
+
+.readout-panel{background:var(--panel); border-radius:10px; padding:20px; box-shadow:inset 0 0 0 1px #04302c;}
+.readout-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media(max-width:680px){.readout-grid{grid-template-columns:1fr;}}
+.readout-block h4{
+  font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+  color:var(--glow-dim); margin-bottom:10px;
+}
+.readout-line{display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; margin-bottom:8px;}
+.readout-num{font-family:var(--font-mono); font-weight:700; font-size:26px; color:var(--glow); text-shadow:0 0 12px rgba(63,224,206,0.45);}
+.readout-label{font-family:var(--font-mono); font-size:12px; color:#CFE8E3;}
+.readout-pct{font-family:var(--font-mono); font-size:11px; color:var(--amber); margin-left:auto;}
+.readout-sep{font-family:var(--font-mono); color:#3E5F5A; font-size:20px; margin:0 2px;}
+
+/* ===================== PRACTICE ARENA ===================== */
+.score-strip{display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;}
+.score-chip{
+  background:var(--panel); color:var(--glow); border-radius:8px; padding:12px 18px; font-family:var(--font-mono);
+  display:flex; flex-direction:column; gap:2px; min-width:130px;
+}
+.score-chip .lbl{font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:#8FBDB6;}
+.score-chip .val{font-size:22px; font-weight:700; text-shadow:0 0 10px rgba(63,224,206,0.4);}
+.q-card{background:var(--white); border:1px solid var(--bench-line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px; margin-bottom:20px;}
+.q-meta{display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap;}
+.q-meta .badge{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; padding:3px 9px; border-radius:20px; color:var(--white);}
+.q-prompt{font-size:16px; font-weight:600; line-height:1.5; margin-bottom:6px;}
+.q-sub{font-size:12.5px; color:var(--ink-soft); margin-bottom:16px;}
+.answer-zone{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px;}
+.answer-zone input[type="text"], .answer-zone input[type="number"]{
+  font-family:var(--font-mono); font-size:16px; padding:10px 12px; border-radius:7px; border:1.5px solid var(--bench-line);
+  width:160px;
+}
+.mcq-options{display:flex; flex-direction:column; gap:8px; margin-top:6px;}
+.mcq-opt{
+  text-align:left; padding:10px 13px; border:1.5px solid var(--bench-line); border-radius:7px; background:var(--white); font-size:13.5px;
+}
+.mcq-opt:hover{border-color:var(--teal);}
+.mcq-opt.picked{border-color:var(--ink); background:var(--ink); color:var(--white);}
+.feedback-banner{
+  display:none; margin-top:16px; padding:12px 15px; border-radius:8px; font-weight:600; font-size:14px; align-items:center; gap:10px;
+}
+.feedback-banner.show{display:flex;}
+.feedback-banner.correct{background:var(--success-bg); color:var(--success);}
+.feedback-banner.wrong{background:var(--danger-bg); color:var(--danger);}
+.diagnostic{display:none; margin-top:18px; border-top:1px dashed var(--bench-line); padding-top:16px;}
+.diagnostic.show{display:block; animation:fadeIn .3s ease;}
+.diagnostic h4{font-size:13.5px; margin-bottom:10px;}
+.diag-row{font-size:13px; margin-bottom:8px; color:var(--ink-soft);}
+.diag-row b{color:var(--ink);}
+.static-punnett{border-collapse:collapse; margin:10px 0;}
+.static-punnett td{border:1.5px solid var(--ink); width:58px; height:46px; text-align:center; font-family:var(--font-mono); font-size:12px;}
+.static-punnett .corner{background:var(--ink);}
+.static-punnett .hdr{background:var(--bench); font-weight:700;}
+.helper-square-toggle{margin-bottom:14px;}
+.helper-square-wrap{display:none; margin-bottom:18px; background:#FBF9F0; border:1px dashed var(--bench-line); border-radius:8px; padding:16px;}
+.helper-square-wrap.show{display:block;}
+.q-actions{display:flex; gap:10px; margin-top:18px; flex-wrap:wrap;}
+
+footer{margin-top:40px; text-align:center; font-size:11.5px; color:var(--steel); font-family:var(--font-mono);}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+}
+</style>
+</head>
+<body>
+<div class="lab-frame">
+
+  <header class="lab-header">
+    <div class="brand">
+      <div class="brand-mark"><span>DNA</span></div>
+      <div class="brand-text">
+        <h1>Virtual Genetics Laboratory</h1>
+        <p>Monohybrid Crosses · Grade 12 Life Sciences</p>
+      </div>
+    </div>
+    <div class="curriculum-tag">CAPS · Genetics &amp; Inheritance</div>
+  </header>
+
+  <nav class="tab-nav" role="tablist" aria-label="Simulation sections">
+    <button class="tab-btn active" data-mode="complete" role="tab" aria-selected="true"><span class="tab-dot"></span>Complete Dominance</button>
+    <button class="tab-btn" data-mode="incomplete" role="tab" aria-selected="false"><span class="tab-dot"></span>Incomplete Dominance</button>
+    <button class="tab-btn" data-mode="codominance" role="tab" aria-selected="false"><span class="tab-dot"></span>Co-dominance</button>
+    <button class="tab-btn" data-mode="practice" role="tab" aria-selected="false"><span class="tab-dot"></span>Practice &amp; Assessment Arena</button>
+  </nav>
+
+  <main>
+    <section class="mode-panel active" id="panel-complete" data-panel="complete"></section>
+    <section class="mode-panel" id="panel-incomplete" data-panel="incomplete"></section>
+    <section class="mode-panel" id="panel-codominance" data-panel="codominance"></section>
+    <section class="mode-panel" id="panel-practice" data-panel="practice"></section>
+  </main>
+
+  <footer>Virtual Genetics Laboratory — built for CAPS Life Sciences Grade 12 · Genetics &amp; Inheritance (Monohybrid Crosses)</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* =====================================================================
+   1. DATA — genetics mode definitions
+   ===================================================================== */
+const MODES = {
+  complete: {
+    key:"complete",
+    name:"Complete Dominance",
+    subtitle:"Pea Plant Height (Mendel's classic monohybrid cross)",
+    badgeClass:"complete",
+    noun:"pea plant",
+    order:["T","t"],
+    genotypes:[
+      {code:"TT", phenotype:"Tall",  desc:"homozygous dominant"},
+      {code:"Tt", phenotype:"Tall",  desc:"heterozygous"},
+      {code:"tt", phenotype:"short", desc:"homozygous recessive"}
+    ],
+    phenotypeOf(g){ return g.indexOf("T")!==-1 ? "Tall" : "short"; },
+    phenotypeColors:{Tall:"#2f7a4a", short:"#8fbf74"},
+    dominanceNote:"The dominant allele (T) fully masks the recessive allele (t). A heterozygote (Tt) is impossible to tell apart from a homozygous dominant (TT) just by looking at it — this is exactly why genotype and phenotype are not the same thing.",
+    icon(phenotype, idSuffix){ return plantIcon(phenotype); },
+    displayAllele(letter){ return letter; },
+    displayGenotype(code){ return code; }
+  },
+  incomplete: {
+    key:"incomplete",
+    name:"Incomplete Dominance",
+    subtitle:"Snapdragon Flower Colour",
+    badgeClass:"incomplete",
+    noun:"snapdragon",
+    order:["R","W"],
+    genotypes:[
+      {code:"RR", phenotype:"Red",  desc:"homozygous"},
+      {code:"RW", phenotype:"Pink", desc:"heterozygous"},
+      {code:"WW", phenotype:"White",desc:"homozygous"}
+    ],
+    phenotypeOf(g){
+      const r=(g.match(/R/g)||[]).length, w=(g.match(/W/g)||[]).length;
+      if(r===2) return "Red"; if(w===2) return "White"; return "Pink";
+    },
+    phenotypeColors:{Red:"#c92a3f", Pink:"#e88bab", White:"#fdfdfb"},
+    dominanceNote:"Neither allele masks the other. The heterozygote (C^R C^W) blends into an intermediate, in-between phenotype (pink) — this is different from co-dominance, where both alleles show up fully rather than blending.",
+    icon(phenotype, idSuffix){ return flowerIcon(phenotype, this.phenotypeColors[phenotype]); },
+    displayAllele(letter){ return "C<sup>"+letter+"</sup>"; },
+    displayGenotype(code){ return code.split("").map(ch=>"C<sup>"+ch+"</sup>").join(""); }
+  },
+  codominance: {
+    key:"codominance",
+    name:"Co-dominance",
+    subtitle:"Cattle Coat Colour (Roan)",
+    badgeClass:"codominance",
+    noun:"cow",
+    order:["R","W"],
+    genotypes:[
+      {code:"RR", phenotype:"Red",  desc:"homozygous"},
+      {code:"RW", phenotype:"Roan", desc:"heterozygous"},
+      {code:"WW", phenotype:"White",desc:"homozygous"}
+    ],
+    phenotypeOf(g){
+      const r=(g.match(/R/g)||[]).length, w=(g.match(/W/g)||[]).length;
+      if(r===2) return "Red"; if(w===2) return "White"; return "Roan";
+    },
+    phenotypeColors:{Red:"#a8402c", Roan:"#c98a72", White:"#f2ede2"},
+    dominanceNote:"Both alleles are fully and simultaneously expressed. A roan coat is not a pink blend — it shows distinct patches of red hair AND white hair side by side. Compare this carefully with incomplete dominance, which blends into one new colour instead.",
+    icon(phenotype, idSuffix){ return cattleIcon(phenotype, idSuffix); },
+    displayAllele(letter){ return "C<sup>"+letter+"</sup>"; },
+    displayGenotype(code){ return code.split("").map(ch=>"C<sup>"+ch+"</sup>").join(""); }
+  }
+};
+
+/* =====================================================================
+   2. UTILITIES
+   ===================================================================== */
+function normalizeGenotype(mode, a, b){
+  const order = mode.order;
+  return [a,b].sort((x,y)=>order.indexOf(x)-order.indexOf(y)).join("");
+}
+function computeOffspring(mode, genoA, genoB){
+  const a = genoA.split(""), b = genoB.split("");
+  const cells = [];
+  for(let r=0;r<2;r++){
+    for(let c=0;c<2;c++){
+      const genotype = normalizeGenotype(mode, a[r], b[c]);
+      cells.push({genotype, phenotype: mode.phenotypeOf(genotype), row:r, col:c});
+    }
+  }
+  return cells;
+}
+function gcd(a,b){ return b===0?a:gcd(b,a%b); }
+function gcdList(nums){
+  const nz = nums.filter(n=>n>0);
+  if(nz.length===0) return 1;
+  return nz.reduce((a,b)=>gcd(a,b));
+}
+function reduceCounts(nums){
+  const g = gcdList(nums);
+  return nums.map(n=> n===0?0:n/g);
+}
+function countBy(cells, key){
+  const counts = {};
+  cells.forEach(c=>{ counts[c[key]] = (counts[c[key]]||0)+1; });
+  return counts;
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function uid(){ return "id"+Math.random().toString(36).slice(2,9); }
+
+/* =====================================================================
+   3. SVG ICONS
+   ===================================================================== */
+function plantIcon(phenotype){
+  const tall = phenotype==="Tall";
+  const stemH = tall?92:42;
+  const topY = 128 - stemH;
+  const positions = tall ? [0.22,0.5,0.78] : [0.35,0.75];
+  let leaves = "";
+  positions.forEach((p,i)=>{
+    const ly = topY + stemH*p;
+    const side = i%2===0?-1:1;
+    leaves += '<ellipse cx="'+(60+side*15)+'" cy="'+ly+'" rx="13" ry="6.5" fill="'+(tall?"#4c9a5f":"#7fb56e")+'" transform="rotate('+(side*28)+' '+(60+side*15)+' '+ly+')"/>';
+  });
+  return '<svg viewBox="0 0 120 156" class="offspring-icon" role="img" aria-label="'+phenotype+' pea plant">'
+    +'<rect x="8" y="126" width="104" height="14" rx="3" fill="#8a6f4e"/>'
+    +'<rect x="56" y="'+topY+'" width="8" height="'+stemH+'" rx="2" fill="'+(tall?"#2f7a4a":"#5a9a54")+'"/>'
+    +leaves
+    +'<circle cx="60" cy="'+(topY-5)+'" r="9" fill="#e8b7d6"/>'
+    +'<text x="60" y="150" text-anchor="middle" class="icon-caption">'+phenotype+'</text>'
+    +'</svg>';
+}
+function flowerIcon(phenotype, colorHex){
+  const stroke = phenotype==="White" ? "#c9c4b4" : "rgba(0,0,0,0.15)";
+  return '<svg viewBox="0 0 120 156" class="offspring-icon" role="img" aria-label="'+phenotype+' snapdragon flower">'
+    +'<rect x="56" y="72" width="8" height="66" rx="2" fill="#3E7D4C"/>'
+    +'<ellipse cx="40" cy="108" rx="13" ry="6" fill="#4c9a5f" transform="rotate(-22 40 108)"/>'
+    +'<ellipse cx="80" cy="116" rx="13" ry="6" fill="#4c9a5f" transform="rotate(22 80 116)"/>'
+    +'<g>'
+      +'<circle cx="60" cy="34" r="16" fill="'+colorHex+'" stroke="'+stroke+'"/>'
+      +'<circle cx="39" cy="49" r="16" fill="'+colorHex+'" stroke="'+stroke+'"/>'
+      +'<circle cx="81" cy="49" r="16" fill="'+colorHex+'" stroke="'+stroke+'"/>'
+      +'<circle cx="45" cy="70" r="16" fill="'+colorHex+'" stroke="'+stroke+'"/>'
+      +'<circle cx="75" cy="70" r="16" fill="'+colorHex+'" stroke="'+stroke+'"/>'
+      +'<circle cx="60" cy="54" r="11" fill="#F4D35E"/>'
+    +'</g>'
+    +'<text x="60" y="150" text-anchor="middle" class="icon-caption">'+phenotype+'</text>'
+    +'</svg>';
+}
+function cattleIcon(phenotype, idSuffix){
+  let fill, patternDef="";
+  if(phenotype==="Red"){ fill="#a8402c"; }
+  else if(phenotype==="White"){ fill="#f2ede2"; }
+  else {
+    const pid = "roan-"+idSuffix;
+    fill = "url(#"+pid+")";
+    patternDef = '<pattern id="'+pid+'" width="9" height="9" patternUnits="userSpaceOnUse">'
+      +'<rect width="9" height="9" fill="#f2ede2"/>'
+      +'<circle cx="2.4" cy="2.4" r="1.5" fill="#a8402c"/>'
+      +'<circle cx="6.6" cy="6.2" r="1.5" fill="#a8402c"/>'
+      +'</pattern>';
+  }
+  return '<svg viewBox="0 0 160 150" class="offspring-icon" role="img" aria-label="'+phenotype+' cattle coat">'
+    +'<defs>'+patternDef+'</defs>'
+    +'<text x="80" y="15" text-anchor="middle" class="icon-caption">'+phenotype+'</text>'
+    +'<ellipse cx="85" cy="88" rx="54" ry="31" fill="'+fill+'" stroke="#3a2e28" stroke-width="2"/>'
+    +'<circle cx="36" cy="68" r="21" fill="'+fill+'" stroke="#3a2e28" stroke-width="2"/>'
+    +'<ellipse cx="25" cy="53" rx="6" ry="9" fill="'+fill+'" stroke="#3a2e28" stroke-width="1.5" transform="rotate(-30 25 53)"/>'
+    +'<ellipse cx="47" cy="53" rx="6" ry="9" fill="'+fill+'" stroke="#3a2e28" stroke-width="1.5" transform="rotate(30 47 53)"/>'
+    +'<circle cx="29" cy="66" r="2.1" fill="#231a16"/>'
+    +'<circle cx="43" cy="66" r="2.1" fill="#231a16"/>'
+    +'<rect x="52" y="112" width="8" height="24" fill="'+fill+'" stroke="#3a2e28" stroke-width="1.5"/>'
+    +'<rect x="76" y="115" width="8" height="24" fill="'+fill+'" stroke="#3a2e28" stroke-width="1.5"/>'
+    +'<rect x="100" y="115" width="8" height="24" fill="'+fill+'" stroke="#3a2e28" stroke-width="1.5"/>'
+    +'<rect x="120" y="112" width="8" height="24" fill="'+fill+'" stroke="#3a2e28" stroke-width="1.5"/>'
+    +'</svg>';
+}
+
+/* =====================================================================
+   4. INTERACTIVE PUNNETT SQUARE COMPONENT
+   ===================================================================== */
+function buildPunnett(hostEl, mode, genoA, genoB, opts){
+  opts = opts || {};
+  const id = uid();
+  const chipsA = genoA.split("");
+  const chipsB = genoB.split("");
+  let leftVals = [null,null];
+  let topVals  = [null,null];
+  let cellState = [[null,null],[null,null]];
+  let selected = null;
+
+  hostEl.innerHTML =
+    '<div class="punnett-wrap">'
+      +'<div class="gamete-pool" data-parent="A">'
+        +'<span class="pool-label">Parent A gametes</span>'
+        +'<div class="chip-row" id="'+id+'-poolA"></div>'
+      +'</div>'
+      +'<div class="punnett-core">'
+        +'<table class="punnett-table" id="'+id+'-table" aria-label="Punnett square">'
+          +'<tr><td class="corner"></td>'
+            +'<td class="zone top-zone empty" data-col="0" tabindex="0" role="button" aria-label="Column 1 gamete slot"></td>'
+            +'<td class="zone top-zone empty" data-col="1" tabindex="0" role="button" aria-label="Column 2 gamete slot"></td></tr>'
+          +'<tr><td class="zone left-zone empty" data-row="0" tabindex="0" role="button" aria-label="Row 1 gamete slot"></td>'
+            +'<td class="cell" data-row="0" data-col="0"></td>'
+            +'<td class="cell" data-row="0" data-col="1"></td></tr>'
+          +'<tr><td class="zone left-zone empty" data-row="1" tabindex="0" role="button" aria-label="Row 2 gamete slot"></td>'
+            +'<td class="cell" data-row="1" data-col="0"></td>'
+            +'<td class="cell" data-row="1" data-col="1"></td></tr>'
+        +'</table>'
+      +'</div>'
+      +'<div class="gamete-pool" data-parent="B">'
+        +'<span class="pool-label">Parent B gametes</span>'
+        +'<div class="chip-row" id="'+id+'-poolB"></div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="punnett-controls">'
+      +'<button type="button" class="btn btn-ghost" data-act="reset">Reset Square</button>'
+      +'<button type="button" class="btn btn-outline" data-act="check">Check Steps</button>'
+      +'<button type="button" class="btn btn-amber" data-act="auto">Auto-Complete</button>'
+    +'</div>'
+    +'<p class="punnett-feedback" id="'+id+'-feedback" aria-live="polite"></p>';
+
+  const poolA = hostEl.querySelector("#"+id+"-poolA");
+  const poolB = hostEl.querySelector("#"+id+"-poolB");
+  const feedback = hostEl.querySelector("#"+id+"-feedback");
+  const table = hostEl.querySelector("#"+id+"-table");
+
+  function setFeedback(msg, cls){
+    feedback.textContent = msg;
+    feedback.className = "punnett-feedback" + (cls? " "+cls : "");
+  }
+
+  function renderPools(){
+    poolA.innerHTML = "";
+    poolB.innerHTML = "";
+    chipsA.forEach((allele, idx)=>{
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.draggable = true;
+      chip.innerHTML = mode.displayAllele(allele);
+      chip.dataset.parent = "A"; chip.dataset.idx = idx; chip.dataset.allele = allele;
+      chip.setAttribute("aria-label", "Parent A allele "+allele);
+      wireChip(chip);
+      poolA.appendChild(chip);
+    });
+    chipsB.forEach((allele, idx)=>{
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.draggable = true;
+      chip.innerHTML = mode.displayAllele(allele);
+      chip.dataset.parent = "B"; chip.dataset.idx = idx; chip.dataset.allele = allele;
+      chip.setAttribute("aria-label", "Parent B allele "+allele);
+      wireChip(chip);
+      poolB.appendChild(chip);
+    });
+  }
+
+  function wireChip(chip){
+    chip.addEventListener("click", ()=>{
+      if(chip.classList.contains("placed")) return;
+      if(selected && selected.chip===chip){
+        selected.chip.classList.remove("selected");
+        selected = null;
+        setFeedback("");
+        return;
+      }
+      if(selected) selected.chip.classList.remove("selected");
+      selected = {parent:chip.dataset.parent, idx:+chip.dataset.idx, allele:chip.dataset.allele, chip};
+      chip.classList.add("selected");
+      setFeedback("Now click a "+(chip.dataset.parent==="A"?"row (left)":"column (top)")+" slot to place this gamete.");
+    });
+    chip.addEventListener("dragstart", (e)=>{
+      e.dataTransfer.setData("text/plain", JSON.stringify({parent:chip.dataset.parent, idx:chip.dataset.idx, allele:chip.dataset.allele}));
+    });
+  }
+
+  function placeInto(zoneEl, parent, idx, allele){
+    if(parent==="A"){ leftVals[+zoneEl.dataset.row] = allele; }
+    else { topVals[+zoneEl.dataset.col] = allele; }
+    zoneEl.innerHTML = mode.displayAllele(allele);
+    zoneEl.classList.add("filled");
+    zoneEl.classList.remove("empty");
+    zoneEl.dataset.chipIdx = idx;
+    const poolChip = (parent==="A"?poolA:poolB).querySelector('[data-idx="'+idx+'"]');
+    if(poolChip) poolChip.classList.add("placed");
+    if(selected){ selected.chip.classList.remove("selected"); selected=null; }
+    setFeedback("");
+    refreshCellsAvailability();
+  }
+
+  function unplace(zoneEl, parent){
+    const idx = zoneEl.dataset.chipIdx;
+    if(idx===undefined) return;
+    if(parent==="A"){ leftVals[+zoneEl.dataset.row] = null; }
+    else { topVals[+zoneEl.dataset.col] = null; }
+    zoneEl.innerHTML = "";
+    zoneEl.classList.remove("filled");
+    zoneEl.classList.add("empty");
+    delete zoneEl.dataset.chipIdx;
+    const poolChip = (parent==="A"?poolA:poolB).querySelector('[data-idx="'+idx+'"]');
+    if(poolChip) poolChip.classList.remove("placed");
+    resetAllCells();
+    setFeedback("Gamete removed — the offspring cells were cleared because the cross changed.");
+  }
+
+  function wireZone(zoneEl, parent){
+    function tryHandle(){
+      const hasVal = zoneEl.classList.contains("filled");
+      if(hasVal){ unplace(zoneEl, parent); return; }
+      if(selected && selected.parent===parent){
+        placeInto(zoneEl, parent, selected.idx, selected.allele);
+      } else if(selected){
+        setFeedback("That gamete belongs to Parent "+selected.parent+" — drop it in the "+(selected.parent==="A"?"row":"column")+" slots instead.", "bad");
+      } else {
+        setFeedback("Select a Parent "+parent+" allele chip first, then click this slot.");
+      }
+    }
+    zoneEl.addEventListener("click", tryHandle);
+    zoneEl.addEventListener("keydown", (e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tryHandle(); }});
+    zoneEl.addEventListener("dragover", (e)=>e.preventDefault());
+    zoneEl.addEventListener("drop", (e)=>{
+      e.preventDefault();
+      try{
+        const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+        if(data.parent!==parent){ setFeedback("That gamete belongs to Parent "+data.parent+".", "bad"); return; }
+        if(zoneEl.classList.contains("filled")) return;
+        placeInto(zoneEl, parent, +data.idx, data.allele);
+      }catch(err){}
+    });
+  }
+  table.querySelectorAll(".left-zone").forEach(z=>wireZone(z,"A"));
+  table.querySelectorAll(".top-zone").forEach(z=>wireZone(z,"B"));
+
+  function resetAllCells(){
+    cellState = [[null,null],[null,null]];
+    table.querySelectorAll(".cell").forEach(c=>{
+      c.innerHTML = "";
+      c.classList.remove("active-cell","correct");
+    });
+    if(opts.onReset) opts.onReset();
+  }
+
+  function refreshCellsAvailability(){
+    table.querySelectorAll(".cell").forEach(cellEl=>{
+      const r = +cellEl.dataset.row, c = +cellEl.dataset.col;
+      const ready = leftVals[r]!==null && topVals[c]!==null;
+      if(ready && !cellState[r][c]) cellEl.classList.add("active-cell");
+      else if(!ready) cellEl.classList.remove("active-cell");
+    });
+  }
+
+  function fillCell(cellEl){
+    const r = +cellEl.dataset.row, c = +cellEl.dataset.col;
+    if(leftVals[r]===null || topVals[c]===null){
+      setFeedback("Fill in both gamete headers before combining this cell.", "bad");
+      return;
+    }
+    if(cellState[r][c]) return;
+    const genotype = normalizeGenotype(mode, leftVals[r], topVals[c]);
+    const correctPheno = mode.phenotypeOf(genotype);
+    const phenoOptions = shuffle(Array.from(new Set(mode.genotypes.map(g=>g.phenotype))));
+    cellEl.classList.remove("active-cell");
+    cellEl.innerHTML =
+      '<div class="cell-genotype">'+mode.displayGenotype(genotype)+'</div>'
+      +'<select class="cell-pheno-select" aria-label="Choose the phenotype for genotype '+genotype+'">'
+        +'<option value="">Phenotype?</option>'
+        +phenoOptions.map(p=>'<option value="'+p+'">'+p+'</option>').join("")
+      +'</select>';
+    const sel = cellEl.querySelector("select");
+    sel.addEventListener("change", ()=>{
+      if(sel.value === correctPheno){
+        cellState[r][c] = {genotype, phenotype: correctPheno};
+        cellEl.classList.add("correct");
+        sel.disabled = true;
+        setFeedback("");
+        checkCompletion();
+      } else if(sel.value){
+        cellEl.classList.add("flash-wrong");
+        setFeedback("Not quite — check whether that matches the genotype shown, then try again.", "bad");
+        setTimeout(()=>{ cellEl.classList.remove("flash-wrong"); sel.value=""; }, 550);
+      }
+    });
+  }
+  table.querySelectorAll(".cell").forEach(cellEl=>{
+    cellEl.addEventListener("click", ()=>fillCell(cellEl));
+  });
+
+  function isComplete(){
+    return cellState[0][0] && cellState[0][1] && cellState[1][0] && cellState[1][1];
+  }
+  function checkCompletion(){
+    if(isComplete() && opts.onComplete){
+      const flat = [cellState[0][0], cellState[0][1], cellState[1][0], cellState[1][1]];
+      opts.onComplete(flat);
+    }
+  }
+
+  table.querySelector('[data-act]');
+  hostEl.querySelector('[data-act="reset"]').addEventListener("click", ()=>{
+    leftVals=[null,null]; topVals=[null,null]; selected=null;
+    table.querySelectorAll(".zone").forEach(z=>{ z.innerHTML=""; z.classList.remove("filled"); z.classList.add("empty"); delete z.dataset.chipIdx; });
+    renderPools();
+    resetAllCells();
+    setFeedback("Square reset. Select gametes to begin again.");
+  });
+  hostEl.querySelector('[data-act="check"]').addEventListener("click", ()=>{
+    const headersReady = leftVals[0]!==null && leftVals[1]!==null && topVals[0]!==null && topVals[1]!==null;
+    if(!headersReady){ setFeedback("Step 1 incomplete: place both parents' gametes into the row and column headers.", "bad"); return; }
+    const cellsFilled = cellState[0][0] && cellState[0][1] && cellState[1][0] && cellState[1][1];
+    if(!cellsFilled){ setFeedback("Step 2 incomplete: click each empty cell to combine the gametes, then identify its phenotype.", "bad"); return; }
+    setFeedback("Excellent — your cross is complete and every genotype/phenotype pair is correct!", "ok");
+  });
+  hostEl.querySelector('[data-act="auto"]').addEventListener("click", ()=>{
+    leftVals = chipsA.slice();
+    topVals = chipsB.slice();
+    table.querySelectorAll(".left-zone").forEach(z=>{ const r=+z.dataset.row; z.innerHTML=mode.displayAllele(leftVals[r]); z.classList.add("filled"); z.classList.remove("empty"); });
+    table.querySelectorAll(".top-zone").forEach(z=>{ const c=+z.dataset.col; z.innerHTML=mode.displayAllele(topVals[c]); z.classList.add("filled"); z.classList.remove("empty"); });
+    poolA.querySelectorAll(".chip").forEach(c=>c.classList.add("placed"));
+    poolB.querySelectorAll(".chip").forEach(c=>c.classList.add("placed"));
+    table.querySelectorAll(".cell").forEach(cellEl=>{
+      const r=+cellEl.dataset.row, c=+cellEl.dataset.col;
+      const genotype = normalizeGenotype(mode, leftVals[r], topVals[c]);
+      const phenotype = mode.phenotypeOf(genotype);
+      cellState[r][c] = {genotype, phenotype};
+      cellEl.classList.remove("active-cell");
+      cellEl.classList.add("correct");
+      cellEl.innerHTML = '<div class="cell-genotype">'+mode.displayGenotype(genotype)+'</div><div style="font-size:11px;color:var(--ink-soft);">'+phenotype+'</div>';
+    });
+    setFeedback("Auto-completed — study how each gamete combination produced its offspring.", "ok");
+    checkCompletion();
+  });
+
+  renderPools();
+  setFeedback("Click a gamete chip, then click a header slot to place it.");
+
+  return {
+    reset(){ hostEl.querySelector('[data-act="reset"]').click(); }
+  };
+}
+
+/* =====================================================================
+   5. STATIC (READ-ONLY) PUNNETT TABLE — used in diagnostic feedback
+   ===================================================================== */
+function staticPunnettHTML(mode, genoA, genoB){
+  const a = genoA.split(""), b = genoB.split("");
+  let html = '<table class="static-punnett" aria-label="Completed Punnett square">';
+  html += '<tr><td class="corner"></td><td class="hdr">'+mode.displayAllele(b[0])+'</td><td class="hdr">'+mode.displayAllele(b[1])+'</td></tr>';
+  for(let r=0;r<2;r++){
+    html += '<tr><td class="hdr">'+mode.displayAllele(a[r])+'</td>';
+    for(let c=0;c<2;c++){
+      const genotype = normalizeGenotype(mode, a[r], b[c]);
+      html += '<td>'+mode.displayGenotype(genotype)+'</td>';
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  return html;
+}
+
+/* =====================================================================
+   6. MODE PANEL (Complete / Incomplete / Co-dominance tabs)
+   ===================================================================== */
+const panelState = {}; // modeKey -> {genoA, genoB}
+
+function renderModePanel(modeKey){
+  const mode = MODES[modeKey];
+  const host = document.getElementById("panel-"+modeKey);
+  panelState[modeKey] = { genoA: mode.genotypes[1].code, genoB: mode.genotypes[2].code };
+
+  host.innerHTML =
+    '<div class="mode-intro">'
+      +'<span class="badge '+mode.badgeClass+'">'+mode.name+'</span>'
+      +'<div><h2>'+mode.subtitle+'</h2><p class="note">'+mode.dominanceNote+'</p></div>'
+    +'</div>'
+
+    +'<div class="station" id="'+modeKey+'-parents">'
+      +'<div class="station-head"><h3><span class="num">1</span>Parent Selection Station</h3><span class="hint">Choose each parent\'s genotype</span></div>'
+      +'<div class="parents-grid">'
+        +'<div class="parent-card" data-parent="A"><div class="parent-title">Parent A</div><div class="geno-options" data-slot="A"></div><div class="parent-readout" data-readout="A"></div></div>'
+        +'<div class="parent-card" data-parent="B"><div class="parent-title">Parent B</div><div class="geno-options" data-slot="B"></div><div class="parent-readout" data-readout="B"></div></div>'
+      +'</div>'
+      +'<div class="randomize-row"><button type="button" class="btn btn-primary" data-act="randomize">🎲 Randomize Both Parents</button></div>'
+    +'</div>'
+
+    +'<div class="station">'
+      +'<div class="station-head"><h3><span class="num">2</span>Interactive Punnett Square</h3><span class="hint">Place gametes, then combine each cell</span></div>'
+      +'<div id="'+modeKey+'-punnett"></div>'
+    +'</div>'
+
+    +'<div class="station">'
+      +'<div class="station-head"><h3><span class="num">3</span>Live Offspring Visualizer</h3><span class="hint">Updates once the cross is complete</span></div>'
+      +'<div class="offspring-row" id="'+modeKey+'-offspring"><p class="placeholder-note">Complete the Punnett square above to reveal the four offspring.</p></div>'
+    +'</div>'
+
+    +'<div class="station">'
+      +'<div class="station-head"><h3><span class="num">4</span>Ratio &amp; Probability Calculator</h3><span class="hint">Genotypic and phenotypic breakdown</span></div>'
+      +'<div class="readout-panel" id="'+modeKey+'-ratio">'
+        +'<div class="readout-grid">'
+          +'<div class="readout-block"><h4>Genotypic Ratio</h4><div id="'+modeKey+'-geno-ratio" style="color:#7c948f;font-family:var(--font-mono);font-size:13px;">Awaiting completed cross…</div></div>'
+          +'<div class="readout-block"><h4>Phenotypic Ratio</h4><div id="'+modeKey+'-pheno-ratio" style="color:#7c948f;font-family:var(--font-mono);font-size:13px;">Awaiting completed cross…</div></div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+
+  renderParentOptions(modeKey);
+  rebuildPunnett(modeKey);
+
+  host.querySelector('[data-act="randomize"]').addEventListener("click", ()=>{
+    const codes = mode.genotypes.map(g=>g.code);
+    panelState[modeKey].genoA = pick(codes);
+    panelState[modeKey].genoB = pick(codes);
+    renderParentOptions(modeKey);
+    rebuildPunnett(modeKey);
+  });
+}
+
+function renderParentOptions(modeKey){
+  const mode = MODES[modeKey];
+  const host = document.getElementById("panel-"+modeKey);
+  ["A","B"].forEach(slotKey=>{
+    const slotEl = host.querySelector('[data-slot="'+slotKey+'"]');
+    slotEl.innerHTML = mode.genotypes.map(g=>{
+      const active = panelState[modeKey]["geno"+slotKey]===g.code ? " active":"";
+      return '<button type="button" class="geno-opt'+active+'" data-code="'+g.code+'"><span>'+g.desc+' — '+g.phenotype+'</span><span class="code">'+mode.displayGenotype(g.code)+'</span></button>';
+    }).join("");
+    slotEl.querySelectorAll(".geno-opt").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        panelState[modeKey]["geno"+slotKey] = btn.dataset.code;
+        renderParentOptions(modeKey);
+        rebuildPunnett(modeKey);
+      });
+    });
+    const code = panelState[modeKey]["geno"+slotKey];
+    const g = mode.genotypes.find(x=>x.code===code);
+    host.querySelector('[data-readout="'+slotKey+'"]').innerHTML = 'Genotype: <b>'+mode.displayGenotype(code)+'</b> &nbsp;→&nbsp; Phenotype: <b>'+g.phenotype+'</b>';
+  });
+}
+
+function rebuildPunnett(modeKey){
+  const mode = MODES[modeKey];
+  const host = document.getElementById("panel-"+modeKey);
+  const punnettHost = document.getElementById(modeKey+"-punnett");
+  const offspringHost = document.getElementById(modeKey+"-offspring");
+  const genoRatioEl = document.getElementById(modeKey+"-geno-ratio");
+  const phenoRatioEl = document.getElementById(modeKey+"-pheno-ratio");
+
+  offspringHost.innerHTML = '<p class="placeholder-note">Complete the Punnett square above to reveal the four offspring.</p>';
+  genoRatioEl.innerHTML = "Awaiting completed cross…";
+  genoRatioEl.style.color = "#7c948f";
+  phenoRatioEl.innerHTML = "Awaiting completed cross…";
+  phenoRatioEl.style.color = "#7c948f";
+
+  buildPunnett(punnettHost, mode, panelState[modeKey].genoA, panelState[modeKey].genoB, {
+    onReset(){
+      offspringHost.innerHTML = '<p class="placeholder-note">Complete the Punnett square above to reveal the four offspring.</p>';
+      genoRatioEl.textContent = "Awaiting completed cross…";
+      phenoRatioEl.textContent = "Awaiting completed cross…";
+    },
+    onComplete(flatCells){
+      renderOffspringAndRatios(mode, flatCells, offspringHost, genoRatioEl, phenoRatioEl);
+    }
+  });
+}
+
+function renderOffspringAndRatios(mode, flatCells, offspringHost, genoRatioEl, phenoRatioEl){
+  offspringHost.innerHTML = flatCells.map((cell,i)=>{
+    return '<div class="offspring-card">'+mode.icon(cell.phenotype, "m"+i+"-"+uid())+'<div class="geno-tag">'+mode.displayGenotype(cell.genotype)+'</div></div>';
+  }).join("");
+
+  const genoCounts = countBy(flatCells, "genotype");
+  const genoCodesPresent = mode.genotypes.map(g=>g.code).filter(c=>genoCounts[c]);
+  const genoNums = reduceCounts(genoCodesPresent.map(c=>genoCounts[c]));
+  genoRatioEl.innerHTML = genoCodesPresent.map((c,i)=>
+    '<span class="readout-line"><span class="readout-num">'+genoNums[i]+'</span><span class="readout-label">'+mode.displayGenotype(c)+'</span></span>'
+  ).join('<span class="readout-sep">:</span>');
+
+  const phenoCounts = countBy(flatCells, "phenotype");
+  const phenoNamesPresent = Object.keys(phenoCounts);
+  const phenoNums = reduceCounts(phenoNamesPresent.map(p=>phenoCounts[p]));
+  phenoRatioEl.innerHTML = phenoNamesPresent.map((p,i)=>{
+    const pct = Math.round(phenoCounts[p]/flatCells.length*100);
+    return '<span class="readout-line"><span class="readout-num">'+phenoNums[i]+'</span><span class="readout-label">'+p+'</span><span class="readout-pct">'+pct+'%</span></span>';
+  }).join('<span class="readout-sep">:</span>');
+}
+
+/* =====================================================================
+   7. PRACTICE & ASSESSMENT ARENA
+   ===================================================================== */
+const quizState = { score:0, streak:0, current:null };
+
+function genotypeArticleDesc(mode, code){
+  const g = mode.genotypes.find(x=>x.code===code);
+  return g.desc+" "+g.phenotype.toLowerCase()+" "+mode.noun+" ("+code.split("").join(code.length?"":"")+" genotype "+mode.displayGenotype(code)+")";
+}
+function plainGenoDesc(mode, code){
+  const g = mode.genotypes.find(x=>x.code===code);
+  return g.desc+" "+g.phenotype.toLowerCase()+" "+mode.noun;
+}
+
+function generateQuestion(){
+  const modeKey = pick(Object.keys(MODES));
+  const mode = MODES[modeKey];
+  const codes = mode.genotypes.map(g=>g.code);
+  const genoA = pick(codes);
+  const genoB = pick(codes);
+  const flatCells = computeOffspring(mode, genoA, genoB);
+  const phenoCounts = countBy(flatCells, "phenotype");
+  const type = pick(["percentage","ratio","concept"]);
+  const q = { modeKey, mode, genoA, genoB, flatCells, phenoCounts, type };
+
+  if(type==="percentage"){
+    const target = pick(Object.keys(phenoCounts));
+    q.targetPhenotype = target;
+    q.correctAnswer = Math.round(phenoCounts[target]/4*100);
+    q.prompt = "Cross a "+plainGenoDesc(mode,genoA)+" ("+mode.displayGenotype(genoA)+") with a "+plainGenoDesc(mode,genoB)+" ("+mode.displayGenotype(genoB)+"). "
+      +"What percentage of the offspring would you expect to be "+target.toLowerCase()+"?";
+    q.sub = "Enter a whole number percentage (0–100).";
+  } else if(type==="ratio"){
+    const order = mode.genotypes.map(g=>g.code);
+    const rawCounts = order.map(c=>phenoCounts_genotype(flatCells,c));
+    q.correctRatio = reduceCounts(rawCounts);
+    q.orderCodes = order;
+    q.prompt = "Cross a "+plainGenoDesc(mode,genoA)+" ("+mode.displayGenotype(genoA)+") with a "+plainGenoDesc(mode,genoB)+" ("+mode.displayGenotype(genoB)+"). "
+      +"What is the resulting genotypic ratio?";
+    q.sub = "Enter three numbers separated by colons, in this order: "+order.map(c=>mode.displayGenotypeStrip(mode,c)).join(" : ")+". Use 0 if a genotype does not appear.";
+  } else {
+    const code = pick(codes);
+    const correct = mode.phenotypeOf(code);
+    const options = shuffle(Array.from(new Set(mode.genotypes.map(g=>g.phenotype))));
+    q.conceptCode = code;
+    q.conceptOptions = options;
+    q.correctConcept = correct;
+    q.prompt = "An organism has the genotype "+mode.displayGenotype(code)+". Which phenotype does it show?";
+    q.sub = "This checks that you can tell genotype (the alleles present) apart from phenotype (the physical trait).";
+  }
+  return q;
+}
+function phenoCounts_genotype(flatCells, code){
+  return flatCells.filter(c=>c.genotype===code).length;
+}
+
+function renderPracticePanel(){
+  const host = document.getElementById("panel-practice");
+  host.innerHTML =
+    '<div class="mode-intro">'
+      +'<span class="badge" style="background:var(--teal);">Practice</span>'
+      +'<div><h2>Practice &amp; Assessment Arena</h2><p class="note">Randomised monohybrid cross problems covering complete dominance, incomplete dominance and co-dominance. Work through the helper Punnett square if you need it, then submit your answer for instant, detailed feedback.</p></div>'
+    +'</div>'
+    +'<div class="score-strip">'
+      +'<div class="score-chip"><span class="lbl">Score</span><span class="val" id="quiz-score">0</span></div>'
+      +'<div class="score-chip"><span class="lbl">Streak</span><span class="val" id="quiz-streak">0</span></div>'
+    +'</div>'
+    +'<div class="q-card" id="quiz-card"></div>';
+  nextQuestion();
+}
+
+function nextQuestion(){
+  quizState.current = generateQuestion();
+  renderQuestionCard();
+}
+
+function renderQuestionCard(){
+  const q = quizState.current;
+  const mode = q.mode;
+  const card = document.getElementById("quiz-card");
+
+  let answerHTML = "";
+  if(q.type==="percentage"){
+    answerHTML = '<div class="answer-zone"><input type="number" id="ans-input" min="0" max="100" step="1" placeholder="0–100" aria-label="Answer percentage"><span>%</span><button type="button" class="btn btn-primary" id="submit-btn">Submit Answer</button></div>';
+  } else if(q.type==="ratio"){
+    answerHTML = '<div class="answer-zone"><input type="text" id="ans-input" placeholder="e.g. 1:2:1" aria-label="Answer ratio"><button type="button" class="btn btn-primary" id="submit-btn">Submit Answer</button></div>';
+  } else {
+    answerHTML = '<div class="mcq-options" id="mcq-options">'
+      + q.conceptOptions.map(o=>'<button type="button" class="mcq-opt" data-val="'+o+'">'+o+'</button>').join("")
+      + '</div>'
+      + '<div class="answer-zone"><button type="button" class="btn btn-primary" id="submit-btn" disabled>Submit Answer</button></div>';
+  }
+
+  card.innerHTML =
+    '<div class="q-meta"><span class="badge '+mode.badgeClass+'">'+mode.name+'</span><span class="hint" style="font-family:var(--font-mono);font-size:11.5px;color:var(--steel);">'+mode.subtitle+'</span></div>'
+    +'<p class="q-prompt">'+q.prompt+'</p>'
+    +'<p class="q-sub">'+q.sub+'</p>'
+    +answerHTML
+    +'<div class="helper-square-toggle"><button type="button" class="btn btn-ghost" id="toggle-helper">🧪 Show helper Punnett square</button></div>'
+    +'<div class="helper-square-wrap" id="helper-wrap"><div id="helper-punnett"></div></div>'
+    +'<div class="feedback-banner" id="feedback-banner"></div>'
+    +'<div class="diagnostic" id="diagnostic"></div>'
+    +'<div class="q-actions"><button type="button" class="btn btn-outline" id="new-q-btn">🔄 New Challenge</button></div>';
+
+  document.getElementById("toggle-helper").addEventListener("click", (e)=>{
+    const wrap = document.getElementById("helper-wrap");
+    const showing = wrap.classList.toggle("show");
+    e.target.textContent = showing ? "🧪 Hide helper Punnett square" : "🧪 Show helper Punnett square";
+    if(showing && !wrap.dataset.built){
+      wrap.dataset.built = "1";
+      buildPunnett(document.getElementById("helper-punnett"), mode, q.genoA, q.genoB, {});
+    }
+  });
+
+  if(q.type==="concept"){
+    let picked = null;
+    card.querySelectorAll(".mcq-opt").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        card.querySelectorAll(".mcq-opt").forEach(b=>b.classList.remove("picked"));
+        btn.classList.add("picked");
+        picked = btn.dataset.val;
+        document.getElementById("submit-btn").disabled = false;
+      });
+    });
+    document.getElementById("submit-btn").addEventListener("click", ()=>submitAnswer(picked));
+  } else {
+    document.getElementById("submit-btn").addEventListener("click", ()=>{
+      submitAnswer(document.getElementById("ans-input").value);
+    });
+  }
+
+  document.getElementById("new-q-btn").addEventListener("click", nextQuestion);
+}
+
+function evaluateAnswer(q, raw){
+  if(q.type==="percentage"){
+    const n = parseInt(String(raw).trim(), 10);
+    return { correct: n===q.correctAnswer, display: (isNaN(n)?"(no answer)":n+"%") };
+  }
+  if(q.type==="ratio"){
+    const parts = String(raw).split(/[:\s]+/).map(s=>s.trim()).filter(s=>s.length).map(Number);
+    if(parts.length!==3 || parts.some(isNaN)){
+      return { correct:false, display: raw || "(no answer)" };
+    }
+    const reducedInput = reduceCounts(parts);
+    const match = reducedInput.length===q.correctRatio.length && reducedInput.every((v,i)=>v===q.correctRatio[i]);
+    return { correct: match, display: parts.join(":") };
+  }
+  // concept
+  return { correct: raw===q.correctConcept, display: raw || "(no answer)" };
+}
+
+function submitAnswer(raw){
+  const q = quizState.current;
+  const result = evaluateAnswer(q, raw);
+  const banner = document.getElementById("feedback-banner");
+  banner.className = "feedback-banner show " + (result.correct ? "correct":"wrong");
+  banner.innerHTML = result.correct
+    ? "✅ Correct! Well done."
+    : "❌ Not quite — your answer: "+result.display+". Review the worked solution below.";
+
+  if(result.correct){ quizState.score += 10; quizState.streak += 1; }
+  else { quizState.streak = 0; }
+  document.getElementById("quiz-score").textContent = quizState.score;
+  document.getElementById("quiz-streak").textContent = quizState.streak;
+
+  renderDiagnostic(q);
+  document.getElementById("submit-btn").disabled = true;
+  const input = document.getElementById("ans-input");
+  if(input) input.disabled = true;
+  document.querySelectorAll(".mcq-opt").forEach(b=>b.disabled=true);
+}
+
+function renderDiagnostic(q){
+  const mode = q.mode;
+  const diag = document.getElementById("diagnostic");
+  const parentAInfo = mode.genotypes.find(g=>g.code===q.genoA);
+  const parentBInfo = mode.genotypes.find(g=>g.code===q.genoB);
+  const gametesA = Array.from(new Set(q.genoA.split(""))).map(a=>mode.displayAllele(a)).join(" and ");
+  const gametesB = Array.from(new Set(q.genoB.split(""))).map(a=>mode.displayAllele(a)).join(" and ");
+
+  const genoCounts = countBy(q.flatCells, "genotype");
+  const genoCodesPresent = mode.genotypes.map(g=>g.code).filter(c=>genoCounts[c]);
+  const genoNums = reduceCounts(genoCodesPresent.map(c=>genoCounts[c]));
+  const genoRatioStr = genoCodesPresent.map((c,i)=>genoNums[i]+" "+mode.displayGenotype(c)).join(" : ");
+
+  const phenoCounts = q.phenoCounts;
+  const phenoNamesPresent = Object.keys(phenoCounts);
+  const phenoNums = reduceCounts(phenoNamesPresent.map(p=>phenoCounts[p]));
+  const phenoRatioStr = phenoNamesPresent.map((p,i)=>phenoNums[i]+" "+p+" ("+Math.round(phenoCounts[p]/4*100)+"%)").join(" : ");
+
+  let answerLine = "";
+  if(q.type==="percentage"){
+    answerLine = "So "+phenoCounts[q.targetPhenotype]+" out of 4 offspring ("+q.correctAnswer+"%) are expected to be "+q.targetPhenotype.toLowerCase()+".";
+  } else if(q.type==="ratio"){
+    answerLine = "The correct genotypic ratio, in the order "+q.orderCodes.map(c=>mode.displayGenotype(c)).join(" : ")+", is "+q.correctRatio.join(" : ")+".";
+  } else {
+    answerLine = "Genotype "+mode.displayGenotype(q.conceptCode)+" produces the "+q.correctConcept.toLowerCase()+" phenotype. Remember: the genotype is the allele combination; the phenotype is what you actually observe.";
+  }
+
+  diag.innerHTML =
+    '<h4>Step-by-step diagnostic</h4>'
+    +'<div class="diag-row"><b>Parent A:</b> genotype '+mode.displayGenotype(q.genoA)+' ('+parentAInfo.desc+') → phenotype <b>'+parentAInfo.phenotype+'</b>. Meiosis produces gametes: '+gametesA+'.</div>'
+    +'<div class="diag-row"><b>Parent B:</b> genotype '+mode.displayGenotype(q.genoB)+' ('+parentBInfo.desc+') → phenotype <b>'+parentBInfo.phenotype+'</b>. Meiosis produces gametes: '+gametesB+'.</div>'
+    +'<div class="diag-row"><b>Fertilisation — completed Punnett square:</b></div>'
+    + staticPunnettHTML(mode, q.genoA, q.genoB)
+    +'<div class="diag-row"><b>Genotypic ratio:</b> '+genoRatioStr+'</div>'
+    +'<div class="diag-row"><b>Phenotypic ratio:</b> '+phenoRatioStr+'</div>'
+    +'<div class="diag-row"><b>Answer:</b> '+answerLine+'</div>';
+  diag.classList.add("show");
+}
+
+/* Helper used in ratio prompt text (kept small & separate for clarity) */
+Object.values(MODES).forEach(m=>{ m.displayGenotypeStrip = function(mode, code){ return mode.displayGenotype(code); }; });
+
+/* =====================================================================
+   8. TAB NAVIGATION + INIT
+   ===================================================================== */
+function activateTab(modeKey){
+  document.querySelectorAll(".tab-btn").forEach(b=>{
+    const on = b.dataset.mode===modeKey;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-selected", on?"true":"false");
+  });
+  document.querySelectorAll(".mode-panel").forEach(p=>{
+    p.classList.toggle("active", p.dataset.panel===modeKey);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  renderModePanel("complete");
+  renderModePanel("incomplete");
+  renderModePanel("codominance");
+  renderPracticePanel();
+
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>activateTab(btn.dataset.mode));
+  });
+});
+
+})();
+</script>
+</body>
+</html>
